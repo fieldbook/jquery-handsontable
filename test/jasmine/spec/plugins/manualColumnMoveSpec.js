@@ -154,4 +154,21 @@ describe('manualColumnMove', function () {
     expect(this.$container.find('tbody tr:eq(0) td:eq(1)').text()).toEqual('Ted');
     expect(this.$container.find('tbody tr:eq(0) td:eq(2)').text()).toEqual('Right');
   })
+
+  it("should not put a manual column mover in columns that are not movable", function () {
+    handsontable({
+      data: [
+        {id: 1, name: "Ted", lastName: "Right"},
+      ],
+      colHeaders: true,
+      manualColumnMove: true,
+      columns: [
+        {data: 'id', movable: false},
+        {data: 'name'},
+        {data: 'lastName'}
+      ]
+    });
+
+    expect(this.$container.find('thead tr:eq(0) th:eq(0) .manualColumnMover').length).toEqual(0);
+  })
 });

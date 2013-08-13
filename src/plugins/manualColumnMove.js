@@ -149,6 +149,8 @@ function HandsontableManualColumnMove() {
 
   this.getColHeader = function (col, TH) {
     if (this.getSettings().manualColumnMove) {
+      var cellProperties = this.getCellMeta(0, col);
+      if (cellProperties.movable === false) return;
       var DIV = document.createElement('DIV');
       DIV.className = 'manualColumnMover';
       TH.firstChild.appendChild(DIV);
