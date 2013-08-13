@@ -71,8 +71,8 @@ function HandsontableManualColumnMove() {
 
       var mover = e.currentTarget;
       var TH = instance.view.wt.wtDom.closest(mover, 'TH');
-      startCol = instance.view.wt.wtDom.index(TH);
-      endCol = startCol;
+      startCol = instance.view.wt.wtDom.index(TH) + instance.colOffset();
+      endCol = startCol + instance.colOffset();
       pressed = true;
       startX = e.pageX;
 
@@ -89,9 +89,10 @@ function HandsontableManualColumnMove() {
         if (active) {
           instance.view.wt.wtDom.removeClass(active, 'active');
         }
-        endCol = instance.view.wt.wtDom.index(this);
+        var endColLocal = instance.view.wt.wtDom.index(this);
+        endCol = endColLocal + instance.colOffset();
         var THs = instance.view.THEAD.querySelectorAll('th');
-        var mover = THs[endCol].querySelector('.manualColumnMover');
+        var mover = THs[endColLocal].querySelector('.manualColumnMover');
         instance.view.wt.wtDom.addClass(mover, 'active');
       }
     });
