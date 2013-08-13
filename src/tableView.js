@@ -86,7 +86,7 @@ Handsontable.TableView = function (instance) {
   });
 
   instance.$table.on('selectstart', function (event) {
-    if (that.settings.fragmentSelection) {
+    if (that.settings.fragmentSelection || $(event.target).closest(':focus').length > 0) {
       return;
     }
 
@@ -320,6 +320,9 @@ Handsontable.TableView.prototype.isTextSelectionAllowed = function (el) {
     return (true);
   }
   if (this.settings.fragmentSelection && this.wt.wtDom.isChildOf(el, this.TBODY)) {
+    return (true);
+  }
+  if ($(el).closest(':focus').length > 0) {
     return (true);
   }
   return false;
