@@ -154,6 +154,7 @@ function HandsontableManualColumnMove() {
       if (cellProperties.movable === false) return;
       var DIV = document.createElement('DIV');
       DIV.className = 'manualColumnMover';
+      DIV.style.height = TH.offsetHeight + 'px';
       TH.firstChild.appendChild(DIV);
     }
   };
