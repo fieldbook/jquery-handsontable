@@ -63,6 +63,7 @@ Handsontable.UndoRedo.prototype.isRedoAvailable = function () {
  * @param changes
  */
 Handsontable.UndoRedo.prototype.add = function (changes, source) {
+  if (!changes) return;
   this.rev++;
   this.data.splice(this.rev); //if we are in point abcdef(g)hijk in history, remove everything after (g)
   this.data.push(changes);

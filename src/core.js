@@ -1901,7 +1901,6 @@ Handsontable.Core = function (rootElement, userSettings) {
       instance.render();
     }
     priv.isPopulated = true;
-    instance.clearUndo();
   };
 
   /**
