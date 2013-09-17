@@ -154,6 +154,11 @@ HandsontableTextEditorClass.prototype.bindTemporaryEvents = function (td, row, c
       return;
     }
 
+    if (event.isImmediatePropagationStopped()) {
+      that.instance.addHookOnce('beforeKeyDown', beforeKeyDownHook);
+      return;
+    }
+
     var ctrlDown = (event.ctrlKey || event.metaKey) && !event.altKey; //catch CTRL but not right ALT (which in some systems triggers ALT+CTRL)
 
     if (Handsontable.helper.isPrintableChar(event.keyCode)) {
