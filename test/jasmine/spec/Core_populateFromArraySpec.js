@@ -35,19 +35,19 @@ describe('Core_populateFromArray', function () {
     expect(output).toEqual([[0,0,'','test'],[0,1,'Kia','test'],[1,0,'2008','test'],[1,1,10,'test']]);
   });
 
-  it('should populate single value for whole selection', function () {
-    var output = null;
+  // it('should populate single value for whole selection', function () {
+  //   var output = null;
 
-    handsontable({
-      data : arrayOfArrays(),
-      onChange: function (changes) {
-        output = changes;
-      }
-    });
-    populateFromArray(0, 0, [["test"]], 3, 0);
+  //   handsontable({
+  //     data : arrayOfArrays(),
+  //     onChange: function (changes) {
+  //       output = changes;
+  //     }
+  //   });
+  //   populateFromArray(0, 0, [["test"]], 3, 0);
 
-    expect(output).toEqual([[0,0,'','test'],[1,0,'2008','test'],[2,0,'2009','test'],[3,0,'2010','test']]);
-  });
+  //   expect(output).toEqual([[0,0,'','test'],[1,0,'2008','test'],[2,0,'2009','test'],[3,0,'2010','test']]);
+  // });
 
   it('should shift values down', function () {
     var output = null;

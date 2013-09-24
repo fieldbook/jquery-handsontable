@@ -175,7 +175,7 @@ CopyPasteClass.prototype.triggerPaste = function (event, str) {
   var that = this;
   if (that.pasteCallbacks) {
     setTimeout(function () {
-      var val = (str || that.elTextarea.value).replace(/\n$/, ''); //remove trailing newline
+      var val = str || that.elTextarea.value;  // This used to remove trailing newlines, but that can be problematic -Jason 24 Sep 2013
       for (var i = 0, ilen = that.pasteCallbacks.length; i < ilen; i++) {
         that.pasteCallbacks[i](val, event);
       }

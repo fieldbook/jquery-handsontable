@@ -22,7 +22,7 @@
       var r, rlen, rows, arr = [], a = 0, c, clen, multiline, last;
       rows = str.split('\n');
       if (rows.length > 1 && rows[rows.length - 1] === '') {
-        rows.pop();
+        // rows.pop();  // This can be problematic; we really want to preserve all lines -Jason 24 Sep 2013
       }
       for (r = 0, rlen = rows.length; r < rlen; r += 1) {
         rows[r] = rows[r].split('\t');

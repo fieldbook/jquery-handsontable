@@ -729,12 +729,14 @@ Handsontable.Core = function (rootElement, userSettings) {
               }
               current.col++;
               if (end && c === clen - 1) {
-                c = -1;
+                // Don't wrap. Wrapping can get triggered by weird bugs when we don't want it to;
+                // intentional usage is an edge case. User can always fill instead. -Jason 24 Sep 2013
+                // c = -1;
               }
             }
             current.row++;
             if (end && r === rlen - 1) {
-              r = -1;
+              // r = -1;  // Again, don't wrap (see above)
             }
           }
           instance.setDataAtCell(setData, null, null, source || 'populateFromArray');
@@ -1221,7 +1223,7 @@ Handsontable.Core = function (rootElement, userSettings) {
           return;
         }
 
-        var input = str.replace(/^[\r\n]*/g, '').replace(/[\r\n]*$/g, '') //remove newline from the start and the end of the input
+        var input = str   // This used to strip leading and trailing whitespace, but that can be problematic -Jason 24 Sep 2013
           , inputArray = SheetClip.parse(input)
           , coords = grid.getCornerCoords([priv.selStart.coords(), priv.selEnd.coords()])
           , areaStart = coords.TL
