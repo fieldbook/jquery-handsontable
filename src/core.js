@@ -731,12 +731,14 @@ Handsontable.Core = function (rootElement, userSettings) {
               if (end && c === clen - 1) {
                 // Don't wrap. Wrapping can get triggered by weird bugs when we don't want it to;
                 // intentional usage is an edge case. User can always fill instead. -Jason 24 Sep 2013
-                // c = -1;
+                //
+                // Actually, do wrap, except on paste. In particular, autofill needs this. -Jason 26 Nov 2013
+                if (source !== 'paste') c = -1;
               }
             }
             current.row++;
             if (end && r === rlen - 1) {
-              // r = -1;  // Again, don't wrap (see above)
+              if (source !== 'paste') r = -1;  // Again, don't wrap on paste (see above)
             }
           }
           instance.setDataAtCell(setData, null, null, source || 'populateFromArray');
