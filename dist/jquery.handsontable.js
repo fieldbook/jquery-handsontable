@@ -41,7 +41,7 @@ if (!Array.prototype.filter) {
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Mon Jul 29 2013 07:50:52 GMT+0200 (Central European Daylight Time)
+ * Date: Tue Jul 08 2014 16:29:17 GMT-0700 (PDT)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -783,12 +783,16 @@ Handsontable.Core = function (rootElement, userSettings) {
               }
               current.col++;
               if (end && c === clen - 1) {
-                c = -1;
+                // Don't wrap. Wrapping can get triggered by weird bugs when we don't want it to;
+                // intentional usage is an edge case. User can always fill instead. -Jason 24 Sep 2013
+                //
+                // Actually, do wrap, except on paste. In particular, autofill needs this. -Jason 26 Nov 2013
+                if (source !== 'paste') c = -1;
               }
             }
             current.row++;
             if (end && r === rlen - 1) {
-              r = -1;
+              if (source !== 'paste') r = -1;  // Again, don't wrap on paste (see above)
             }
           }
           instance.setDataAtCell(setData, null, null, source || 'populateFromArray');
@@ -1275,7 +1279,7 @@ Handsontable.Core = function (rootElement, userSettings) {
           return;
         }
 
-        var input = str.replace(/^[\r\n]*/g, '').replace(/[\r\n]*$/g, '') //remove newline from the start and the end of the input
+        var input = str   // This used to strip leading and trailing whitespace, but that can be problematic -Jason 24 Sep 2013
           , inputArray = SheetClip.parse(input)
           , coords = grid.getCornerCoords([priv.selStart.coords(), priv.selEnd.coords()])
           , areaStart = coords.TL
@@ -1955,7 +1959,6 @@ Handsontable.Core = function (rootElement, userSettings) {
       instance.render();
     }
     priv.isPopulated = true;
-    instance.clearUndo();
   };
 
   /**
@@ -2914,7 +2917,7 @@ Handsontable.TableView = function (instance) {
   });
 
   instance.$table.on('selectstart', function (event) {
-    if (that.settings.fragmentSelection) {
+    if (that.settings.fragmentSelection || $(event.target).closest(':focus').length > 0) {
       return;
     }
 
@@ -3148,6 +3151,9 @@ Handsontable.TableView.prototype.isTextSelectionAllowed = function (el) {
     return (true);
   }
   if (this.settings.fragmentSelection && this.wt.wtDom.isChildOf(el, this.TBODY)) {
+    return (true);
+  }
+  if ($(el).closest(':focus').length > 0) {
     return (true);
   }
   return false;
@@ -3568,6 +3574,7 @@ Handsontable.UndoRedo.prototype.isRedoAvailable = function () {
  * @param changes
  */
 Handsontable.UndoRedo.prototype.add = function (changes, source) {
+  if (!changes) return;
   this.rev++;
   this.data.splice(this.rev); //if we are in point abcdef(g)hijk in history, remove everything after (g)
   this.data.push(changes);
@@ -3922,8 +3929,13 @@ HandsontableTextEditorClass.prototype.bindTemporaryEvents = function (td, row, c
   this.originalValue = value;
   this.cellProperties = cellProperties;
 
-  this.beforeKeyDownHook = function (event) {
+  this.beforeKeyDownHook = function beforeKeyDownHook (event) {
     if (that.state !== that.STATE_VIRGIN) {
+      return;
+    }
+
+    if (event.isImmediatePropagationStopped()) {
+      that.instance.addHookOnce('beforeKeyDown', beforeKeyDownHook);
       return;
     }
 
@@ -3951,6 +3963,8 @@ HandsontableTextEditorClass.prototype.bindTemporaryEvents = function (td, row, c
       }
       event.preventDefault(); //prevent new line at the end of textarea
       event.stopImmediatePropagation();
+    } else {
+      that.instance.addHookOnce('beforeKeyDown', beforeKeyDownHook);
     }
   };
   that.instance.addHookOnce('beforeKeyDown', this.beforeKeyDownHook);
@@ -5655,7 +5669,8 @@ function HandsontableManualColumnMove() {
 
       var mover = e.currentTarget;
       var TH = instance.view.wt.wtDom.closest(mover, 'TH');
-      startCol = instance.view.wt.wtDom.index(TH);
+      startCol = instance.view.wt.wtDom.index(TH) + instance.colOffset();
+      endCol = startCol;
       pressed = true;
       startX = e.pageX;
 
@@ -5672,9 +5687,10 @@ function HandsontableManualColumnMove() {
         if (active) {
           instance.view.wt.wtDom.removeClass(active, 'active');
         }
-        endCol = instance.view.wt.wtDom.index(this);
+        var endColLocal = instance.view.wt.wtDom.index(this);
+        endCol = endColLocal + instance.colOffset();
         var THs = instance.view.THEAD.querySelectorAll('th');
-        var mover = THs[endCol].querySelector('.manualColumnMover');
+        var mover = THs[endColLocal].querySelector('.manualColumnMover');
         instance.view.wt.wtDom.addClass(mover, 'active');
       }
     });
@@ -5732,8 +5748,11 @@ function HandsontableManualColumnMove() {
 
   this.getColHeader = function (col, TH) {
     if (this.getSettings().manualColumnMove) {
+      var cellProperties = this.getCellMeta(0, col);
+      if (cellProperties.movable === false) return;
       var DIV = document.createElement('DIV');
       DIV.className = 'manualColumnMover';
+      DIV.style.height = TH.offsetHeight + 'px';
       TH.firstChild.appendChild(DIV);
     }
   };
@@ -5825,6 +5844,7 @@ function HandsontableManualColumnResize() {
       startOffset = (thOffset - rootOffset) - 6;
 
       resizer.style.left = startOffset + getColumnWidth.call(instance, TH) + 'px';
+      handle.style.height = TH.offsetHeight + 'px';
 
       this.rootElement[0].appendChild(resizer);
     }
@@ -6893,7 +6913,7 @@ CopyPasteClass.prototype.triggerPaste = function (event, str) {
   var that = this;
   if (that.pasteCallbacks) {
     setTimeout(function () {
-      var val = (str || that.elTextarea.value).replace(/\n$/, ''); //remove trailing newline
+      var val = str || that.elTextarea.value;  // This used to remove trailing newlines, but that can be problematic -Jason 24 Sep 2013
       for (var i = 0, ilen = that.pasteCallbacks.length; i < ilen; i++) {
         that.pasteCallbacks[i](val, event);
       }
@@ -8414,7 +8434,7 @@ WalkontableScrollbar.prototype.getHandleSizeRatio = function (viewportCount, tot
   if (!totalCount || viewportCount > totalCount || viewportCount == totalCount) {
     return 1;
   }
-  return 1 / totalCount;
+  return viewportCount / totalCount;
 };
 
 WalkontableScrollbar.prototype.prepare = function () {
