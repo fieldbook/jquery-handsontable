@@ -41,7 +41,7 @@ if (!Array.prototype.filter) {
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Tue Jul 08 2014 16:29:17 GMT-0700 (PDT)
+ * Date: Fri Jul 11 2014 16:58:09 GMT-0700 (PDT)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -775,10 +775,10 @@ Handsontable.Core = function (rootElement, userSettings) {
             current.col = start.col;
             clen = input[r] ? input[r].length : 0;
             for (c = 0; c < clen; c++) {
-              if ((end && current.col > end.col) || (!priv.settings.minSpareCols && current.col > instance.countCols() - 1) || (current.col >= priv.settings.maxCols)) {
+              if ((end && current.col > end.col) || (!(source === 'paste' && priv.settings.sendExtraColumnsOnPaste) && !priv.settings.minSpareCols && current.col > instance.countCols() - 1) || (current.col >= priv.settings.maxCols)) {
                 break;
               }
-              if (!instance.getCellMeta(current.row, current.col).readOnly) {
+              if (!instance.getCellMeta(current.row, current.col).readOnly || (source === 'paste' && priv.settings.sendExtraColumnsOnPaste)) {
                 setData.push([current.row, current.col, input[r][c]]);
               }
               current.col++;
@@ -1651,7 +1651,7 @@ Handsontable.Core = function (rootElement, userSettings) {
 
     instance.forceFullRender = true; //used when data was changed
     grid.adjustRowsAndCols();
-    selection.refreshBorders(null, true);
+    if (source !== 'paste' || !(priv.settings.skipRedrawOnPaste)) selection.refreshBorders(null, true);
     instance.PluginHooks.run('afterChange', changes, source || 'edit');
   }
 
@@ -1717,11 +1717,19 @@ Handsontable.Core = function (rootElement, userSettings) {
       if (typeof input[i][1] !== 'number') {
         throw new Error('Method `setDataAtCell` accepts row and column number as its parameters. If you want to use object property name, use method `setDataAtRowProp`');
       }
-      prop = datamap.colToProp(input[i][1]);
+
+      var propOrColumn = datamap.colToProp(input[i][1]);
+      // If this column is readOnly and we are pasting with extra columns, pass
+      // along input[i][1] which is the column number of the change instead of
+      // the actual column - bernard - 2014-07-11
+      if (instance.getCellMeta(input[i][0], input[i][1]).readOnly && (source === 'paste' && priv.settings.sendExtraColumnsOnPaste)) {
+        propOrColumn = input[i][1];
+      }
+
       changes.push([
         input[i][0],
-        prop,
-        datamap.get(input[i][0], prop),
+        propOrColumn,
+        datamap.get(input[i][0], propOrColumn),
         input[i][2]
       ]);
     }
