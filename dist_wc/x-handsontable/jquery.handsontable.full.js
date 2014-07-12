@@ -41,7 +41,7 @@ if (!Array.prototype.filter) {
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Fri Jul 11 2014 16:58:09 GMT-0700 (PDT)
+ * Date: Fri Jul 11 2014 18:23:27 GMT-0700 (PDT)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -1289,7 +1289,7 @@ Handsontable.Core = function (rootElement, userSettings) {
           };
 
         instance.PluginHooks.once('afterChange', function (changes, source) {
-          if (changes && changes.length) {
+          if (changes && changes.length && !priv.settings.skipRedrawOnPaste) {
             instance.selectCell(areaStart.row, areaStart.col, areaEnd.row, areaEnd.col);
           }
         });
