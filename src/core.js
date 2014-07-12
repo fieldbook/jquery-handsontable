@@ -1235,7 +1235,7 @@ Handsontable.Core = function (rootElement, userSettings) {
           };
 
         instance.PluginHooks.once('afterChange', function (changes, source) {
-          if (changes && changes.length) {
+          if (changes && changes.length && !priv.settings.skipRedrawOnPaste) {
             instance.selectCell(areaStart.row, areaStart.col, areaEnd.row, areaEnd.col);
           }
         });
