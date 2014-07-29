@@ -41,7 +41,7 @@ if (!Array.prototype.filter) {
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Fri Jul 11 2014 18:23:27 GMT-0700 (PDT)
+ * Date: Tue Jul 29 2014 16:11:33 GMT-0700 (PDT)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -3513,10 +3513,13 @@ Handsontable.helper.getCellMethod = function (methodName, methodFunction) {
  * @returns {boolean}
  */
 Handsontable.helper.isOutsideInput = function(element){
+  if (!element) return false;
+
   var inputs = ['INPUT', 'SELECT', 'TEXTAREA'];
 
   return inputs.indexOf(element.nodeName) > -1 && element.className.indexOf('handsontableInput') == -1;
 }
+
 /**
  * Handsontable UndoRedo class
  */
