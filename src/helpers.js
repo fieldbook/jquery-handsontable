@@ -228,6 +228,8 @@ Handsontable.helper.getCellMethod = function (methodName, methodFunction) {
  * @returns {boolean}
  */
 Handsontable.helper.isOutsideInput = function(element){
+  if (!element) return false;
+
   var inputs = ['INPUT', 'SELECT', 'TEXTAREA'];
 
   return inputs.indexOf(element.nodeName) > -1 && element.className.indexOf('handsontableInput') == -1;
