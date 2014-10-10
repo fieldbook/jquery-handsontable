@@ -99,6 +99,11 @@ HandsontableAutocompleteEditorClass.prototype.bindEvents = function () {
     }
   });
 
+  // Also need to update on click (could've changed the cursor position) -
+  // bernard 2014-10-09
+  this.$textarea.on('click', function (event) {
+    that.typeahead.lookup();
+  });
 
   HandsontableTextEditorClass.prototype.bindEvents.call(this);
 };
