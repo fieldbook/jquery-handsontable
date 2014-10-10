@@ -41,7 +41,7 @@ if (!Array.prototype.filter) {
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Thu Oct 09 2014 19:37:45 GMT-0700 (PDT)
+ * Date: Fri Oct 10 2014 11:49:04 GMT-0700 (PDT)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
