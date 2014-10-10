@@ -41,7 +41,7 @@ if (!Array.prototype.filter) {
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Fri Oct 10 2014 11:49:04 GMT-0700 (PDT)
+ * Date: Fri Oct 10 2014 13:08:59 GMT-0700 (PDT)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -4321,9 +4321,7 @@ HandsontableAutocompleteEditorClass.prototype.bindEvents = function () {
     8: true, // backspace
     46: true, // delete
     37: true, // left arrow
-    38: true, // up arrow
     39: true, // right arrow
-    40: true, // down arrow
     35: true, // end
     36: true, // home
   };

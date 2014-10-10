@@ -86,9 +86,7 @@ HandsontableAutocompleteEditorClass.prototype.bindEvents = function () {
     8: true, // backspace
     46: true, // delete
     37: true, // left arrow
-    38: true, // up arrow
     39: true, // right arrow
-    40: true, // down arrow
     35: true, // end
     36: true, // home
   };
