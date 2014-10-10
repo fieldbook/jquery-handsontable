@@ -78,12 +78,32 @@ HandsontableAutocompleteEditorClass.prototype.bindEvents = function () {
     }
   });
 
+  // Need to add arrow keys and home / end since we need to complete midline
+  // now - bernard 2014-10-09
+  var lookupExtraKeyCodes = {
+    113: true, // f2
+    13: true, // enter
+    8: true, // backspace
+    46: true, // delete
+    37: true, // left arrow
+    38: true, // up arrow
+    39: true, // right arrow
+    40: true, // down arrow
+    35: true, // end
+    36: true, // home
+  };
+
   this.$textarea.on('keyup.acEditor', function (event) {
-    if (Handsontable.helper.isPrintableChar(event.keyCode) || event.keyCode === 113 || event.keyCode === 13 || event.keyCode === 8 || event.keyCode === 46) {
+    if (Handsontable.helper.isPrintableChar(event.keyCode) || lookupExtraKeyCodes[event.keyCode]) {
       that.typeahead.lookup();
     }
   });
 
+  // Also need to update on click (could've changed the cursor position) -
+  // bernard 2014-10-09
+  this.$textarea.on('click', function (event) {
+    that.typeahead.lookup();
+  });
 
   HandsontableTextEditorClass.prototype.bindEvents.call(this);
 };

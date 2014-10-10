@@ -41,7 +41,7 @@ if (!Array.prototype.filter) {
  * Licensed under the MIT license.
  * http://handsontable.com/
  *
- * Date: Tue Jul 29 2014 16:11:33 GMT-0700 (PDT)
+ * Date: Thu Oct 09 2014 19:37:45 GMT-0700 (PDT)
  */
 /*jslint white: true, browser: true, plusplus: true, indent: 4, maxerr: 50 */
 
@@ -4313,12 +4313,32 @@ HandsontableAutocompleteEditorClass.prototype.bindEvents = function () {
     }
   });
 
+  // Need to add arrow keys and home / end since we need to complete midline
+  // now - bernard 2014-10-09
+  var lookupExtraKeyCodes = {
+    113: true, // f2
+    13: true, // enter
+    8: true, // backspace
+    46: true, // delete
+    37: true, // left arrow
+    38: true, // up arrow
+    39: true, // right arrow
+    40: true, // down arrow
+    35: true, // end
+    36: true, // home
+  };
+
   this.$textarea.on('keyup.acEditor', function (event) {
-    if (Handsontable.helper.isPrintableChar(event.keyCode) || event.keyCode === 113 || event.keyCode === 13 || event.keyCode === 8 || event.keyCode === 46) {
+    if (Handsontable.helper.isPrintableChar(event.keyCode) || lookupExtraKeyCodes[event.keyCode]) {
       that.typeahead.lookup();
     }
   });
 
+  // Also need to update on click (could've changed the cursor position) -
+  // bernard 2014-10-09
+  this.$textarea.on('click', function (event) {
+    that.typeahead.lookup();
+  });
 
   HandsontableTextEditorClass.prototype.bindEvents.call(this);
 };
@@ -4430,6 +4450,7 @@ Handsontable.AutocompleteEditor = function (instance, td, row, col, prop, value,
     instance.autocompleteEditor.finishEditing(isCancelled);
   }
 };
+
 function toggleCheckboxCell(instance, row, prop, cellProperties) {
   if (Handsontable.helper.stringify(instance.getDataAtRowProp(row, prop)) === Handsontable.helper.stringify(cellProperties.checkedTemplate)) {
     instance.setDataAtRowProp(row, prop, cellProperties.uncheckedTemplate);
